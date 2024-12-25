@@ -1,15 +1,14 @@
-
 import * as React from 'react';
 import CardComponents from './TodoList'; 
-import { TodosContext } from './contexts/TodoContext';
+import TodosProvider, { TodosContext } from './contexts/TodoContext';
+import { ToastProvider} from "./contexts/ToastContext";
 import { v4 as uniId } from 'uuid';
  import './App.css'
 
 
- //#6d4c41
- //rgba(219, 163, 163, 0.813)
 
- const IntialTodos = [
+
+   const IntialTodos = [
   {
   id: uniId(),
   title:"samar",
@@ -33,15 +32,19 @@ import { v4 as uniId } from 'uuid';
 
 
  function App() {
-   const [todos, setTodos] = React.useState(IntialTodos)
+   //const [todos, setTodos] = React.useState(IntialTodos)
+  
+ 
   return (
     <>
-    <div>
-      <TodosContext.Provider value={{ todos, setTodos }}>
-       <CardComponents />
-       </TodosContext.Provider>
-    </div>
-    
+     <TodosProvider>
+     <ToastProvider>
+      <div>
+          <CardComponents />
+      </div>
+    </ToastProvider>
+    </TodosProvider>
+   
 
 
     

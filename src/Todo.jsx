@@ -1,172 +1,54 @@
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import TextField from '@mui/material/TextField';
+
 import Box from '@mui/material/Box';
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import CreateRoundedIcon from '@mui/icons-material/CreateRounded';
 import DeleteRoundedIcon from '@mui/icons-material/DeleteRounded';
- import { TodosContext } from './contexts/TodoContext';
-import React from 'react';
+
+ import{useTodo} from "./contexts/TodoContext";
+ import { useToast } from './contexts/ToastContext';
 
 
-export default function TaskBox({todo}) {
-
-  const {todos, setTodos} = React.useContext(TodosContext)
- const [showUpdateDialog, setShowUpdateDialog] = React.useState(false)
- const [updateTodos, setUpadteTodos] = React.useState({title:todo.title, details:todo.details})
- const [ShowDeleteDialog, setShowDeleteDialog] = React.useState(false)
+export default function TaskBox({todo, showDelete, showUpdate}) {
+  const {todos, dispatch} = useTodo()
+  const{showHideToast} = useToast()
 
 
 
-  function handleUpdateClick() {
-    setShowUpdateDialog(true)
-   
- }
- function handleUpdateDialogClose(){
-  setShowUpdateDialog(false)
 
- }
 
- function handleUpdateConfirm(){
-  const updatedTodos = todos.map((t) => {
-    if(t.id == todo.id){
-      return ({...t, title: updateTodos.title, details: updateTodos.details})
-    } else{
-      return t
-    }
-  })
 
-  setTodos(updatedTodos)
-
-  localStorage.setItem("todos", JSON.stringify(updatedTodos))
-  setShowUpdateDialog(false)
+ function handleUpdateClick() {
+ showUpdate(todo)
+ 
+}
 
  
 
- }
+
 
 
 
 
   function handleDeleteClick() {
-    setShowDeleteDialog(true)
+    showDelete(todo);
+   
   
 }
 
-function handleDeleteDialogClose() {
-  setShowDeleteDialog(false)
- 
-}
 
-function handleDeleteConfirm(){
-  const updatedTodos = todos.filter((t) => {
-    if(t.id == todo.id){
-      return false
-    }else {
-      return true
-    }
-    //return t.id != todo.id
 
-  })
-
-  setTodos(updatedTodos)
-  localStorage.setItem("todos", JSON.stringify(updatedTodos))
-}
 
   function handleCheckClick(){
-    const updatedTodos = todos.map((t) => {
-      if (t.id == todo.id) {
-
-        return { ...t, isCompleted: !t.isCompleted }  
-
-      }
-
-      return t
-
-    });
-
-    setTodos(updatedTodos)
-    localStorage.setItem("todos", JSON.stringify(updatedTodos))
+    dispatch({type:"clicked", payload:todo})
+    showHideToast("تم التعديل بنجاح")
    
   }
   return (
     <>
-    {/*update Dialog*/ }
-    <Dialog
-        open={showUpdateDialog}
-        onClose={handleUpdateDialogClose}
-        PaperProps={{
-          component: 'form',
-          onSubmit: (event) => {
-            event.preventDefault();
-            const formData = new FormData(event.currentTarget);
-            const formJson = Object.fromEntries(formData.entries());
-            const email = formJson.email;
-            console.log(email);
-            handleUpdateDialogClose();
-          },
-        }}
-      >
-        <DialogTitle>تعديل مهمة </DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            required
-            margin="dense"
-            id="name"
-            label="عنوان المهمة"
-            fullWidth
-            variant="standard"
-            value={updateTodos.title}
-            onChange={(e)=>{
-              setUpadteTodos({ ...updateTodos,  title: e.target.value} )
-            }}
-          />
+    
 
-       <TextField
-            autoFocus
-            required
-            margin="dense"
-            id="name"
-            label="التفاصيل"
-            fullWidth
-            variant="standard"
-            value={updateTodos.details}
-            onChange={(e)=>{
-              setUpadteTodos({ ...updateTodos,  details: e.target.value} )
-            }}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleUpdateDialogClose}>اغلاق</Button>
-          <Button onClick={handleUpdateConfirm}>تأكيد </Button>
-        </DialogActions>
-      </Dialog>
-      {/*====delete Dialog=======*/ }
-
-   {/*delete Dialog*/ }
-     <Dialog
-     onClose={handleDeleteDialogClose}
-        open={ShowDeleteDialog}
-        keepMounted
-        aria-describedby="alert-dialog-slide-description"
-      >
-        <DialogTitle>{" هل أنت متأكد من حذف هذه المهمة ؟"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description">
-          لا يمكنك التراجع عن الحذف بعد اتمامه 
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteConfirm}>نعم، بالتأكيد </Button>
-          <Button onClick={handleDeleteDialogClose}>اغلاق</Button>
-        </DialogActions>
-      </Dialog>
-     <Box  className="MuiBox-root" component="section" sx={{  border: '1px solid white', cursor:"pointer" }}>
+   
+      <Box  className="MuiBox-root" component="section" sx={{  border: '1px solid white', cursor:"pointer" }}>
       <div>
       <h2 style={{marginBottom:"0",textDecoration: todo.isCompleted? "line-through" : "none"}}>{todo.title}</h2>
       <h3 style={{marginTop:"0"}}> {todo.details}</h3>
